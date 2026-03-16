@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AlarmDistribution.WebApi/AlarmDistribution.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AlarmDistribution.WebApi.Tests/AlarmDistribution.WebApi.Tests.csproj" Id="85fe2f1b-c099-4efa-8591-1b789360f171" />
+  </Folder>
+</Solution>
