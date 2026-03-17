@@ -26,7 +26,7 @@ public class AckAlarmCommandHandler : IRequestHandler<AckAlarmCommand>
         if (alarm == null)
             throw new AlarmNotFoundException(request.AlarmId);  
 
-        var nurse = await _nurseRepository.GetByIdAsync(request.NurseId, false, cancellationToken);
+        var nurse = await _nurseRepository.GetByIdAsync(request.NurseId, true, cancellationToken);
         
         if (nurse is null)
             throw new NurseNotFoundException(request.NurseId);
