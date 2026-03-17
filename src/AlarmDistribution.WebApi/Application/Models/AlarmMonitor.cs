@@ -9,7 +9,7 @@ public sealed class AlarmMonitor : IDisposable
     private readonly Func<AlarmMonitor, Task> _onEscalate;
     private readonly ITimer _escalationTimer;
     private readonly ILogger<AlarmMonitor> _logger;
-        
+
     public AlarmMonitor(Alarm alarm, Func<AlarmMonitor, Task> onEscalate, ILogger<AlarmMonitor> logger,
         TimeSpan? escalationTimeout = null, TimeProvider? timeProvider = null)
     {
@@ -40,11 +40,14 @@ public sealed class AlarmMonitor : IDisposable
     {
         try
         {
-            if (!Alarm.IsAcknowledged)
+            if (Alarm.IsAcknowledged)
             {
-                _logger.LogInformation("Escalating alarm with ID {AlarmId} after timeout of {EscalationTimeout}", Alarm.Id, EscalationTimeout);
-                await _onEscalate(this);
+                _logger.LogInformation("Alarm with ID {AlarmId} acknowledged before escalation, skipping escalation", Alarm.Id);
+                return;
             }
+
+            _logger.LogInformation("Escalating alarm with ID {AlarmId} after timeout of {EscalationTimeout}", Alarm.Id, EscalationTimeout);
+            await _onEscalate(this);
         }
         catch (Exception ex)
         {
@@ -58,12 +61,12 @@ public sealed class AlarmMonitor : IDisposable
 
     public void Dispose()
     {
-        if (Disposed) 
+        if (Disposed)
             return;
 
         _escalationTimer.Dispose();
         Disposed = true;
 
-        _logger.LogInformation("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
+        _logger.LogDebug("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
     }
 }
