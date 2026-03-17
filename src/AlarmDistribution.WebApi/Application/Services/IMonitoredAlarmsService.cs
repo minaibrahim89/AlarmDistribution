@@ -1,6 +1,5 @@
 ﻿using AlarmDistribution.WebApi.Application.Model;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
-using AlarmDistribution.WebApi.Domain.Aggregates.Patients;
 
 namespace AlarmDistribution.WebApi.Application.Services;
 

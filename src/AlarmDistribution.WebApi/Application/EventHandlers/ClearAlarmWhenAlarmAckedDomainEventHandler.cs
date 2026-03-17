@@ -8,20 +8,20 @@ namespace AlarmDistribution.WebApi.Application.EventHandler;
 public class ClearAlarmWhenAlarmAckedDomainEventHandler : IDomainEventHandler<AlarmAckedDomainEvent>
 {
     private readonly INurseRepository _nurseRepository;
-    private readonly IAlarmNotificationService _alarmNotificationService;
+    private readonly IMonitoredAlarmsService _monitoredAlarmsService;
     private readonly ILogger<ClearAlarmWhenAlarmAckedDomainEventHandler> _logger;
 
     public ClearAlarmWhenAlarmAckedDomainEventHandler(
         INurseRepository nurseRepository,
-        IAlarmNotificationService alarmEscalationService,
+        IMonitoredAlarmsService monitoredAlarmsService,
         ILogger<ClearAlarmWhenAlarmAckedDomainEventHandler> logger)
     {
         ArgumentNullException.ThrowIfNull(nurseRepository);
-        ArgumentNullException.ThrowIfNull(alarmEscalationService);
+        ArgumentNullException.ThrowIfNull(monitoredAlarmsService);
         ArgumentNullException.ThrowIfNull(logger);
 
         _nurseRepository = nurseRepository;
-        _alarmNotificationService = alarmEscalationService;
+        _monitoredAlarmsService = monitoredAlarmsService;
         _logger = logger;
     }
 
@@ -29,7 +29,7 @@ public class ClearAlarmWhenAlarmAckedDomainEventHandler : IDomainEventHandler<Al
     {
         _logger.LogInformation("Alarm with ID {AlarmId} acknowledged, cancelling escalation if active", notification.AlarmId);
         
-        _alarmNotificationService.CancelEscalationMonitoring(notification.AlarmId);
+        _monitoredAlarmsService.StopAlarmMonitoring(notification.AlarmId);
 
         var nurse = await _nurseRepository.GetByIdAsync(notification.NurseId, true, cancellationToken);
         if (nurse != null)

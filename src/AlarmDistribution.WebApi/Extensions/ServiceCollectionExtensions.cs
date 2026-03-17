@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
             .AddMediator(opt => opt.ServiceLifetime = ServiceLifetime.Scoped)
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionPipelineBehavior<,>))
             .AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>()
-            .AddScoped<IAlarmNotificationService, AlarmNotificationService>()
+            .AddScoped<IMonitoredAlarmsService, MonitoredAlarmsService>()
             .AddSingleton<IMonitoredAlarmsService, MonitoredAlarmsService>()
             .AddRepositories(configuration);
     }
