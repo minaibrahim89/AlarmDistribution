@@ -1,5 +1,6 @@
 PRAGMA foreign_keys = ON;
 
+DELETE FROM Alarms;
 DELETE FROM Patients;
 DELETE FROM Nurses;
 
