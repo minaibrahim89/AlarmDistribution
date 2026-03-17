@@ -13,7 +13,7 @@ namespace AlarmDistribution.WebApi.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAppServices(this IServiceCollection services)
+    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
         return services
             .AddMediator(opt => opt.ServiceLifetime = ServiceLifetime.Scoped)
@@ -21,13 +21,16 @@ public static class ServiceCollectionExtensions
             .AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>()
             .AddScoped<IAlarmNotificationService, AlarmNotificationService>()
             .AddSingleton<IMonitoredAlarmsService, MonitoredAlarmsService>()
-            .AddRepositories();
+            .AddRepositories(configuration);
     }
 
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("AlarmDistributionDb")
+            ?? "Data Source=AlarmDistribution.db";
+
         services.AddDbContext<AppDbContext>(options =>
-            options.UseInMemoryDatabase("AlarmDistributionDb"));
+            options.UseSqlite(connectionString));
 
         services.AddScoped<IAlarmRepository, AlarmRepository>();
         services.AddScoped<INurseRepository, NurseRepository>();
