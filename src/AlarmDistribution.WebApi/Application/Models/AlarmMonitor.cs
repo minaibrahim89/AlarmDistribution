@@ -45,6 +45,9 @@ public sealed class AlarmMonitor : IDisposable
 
     public void Dispose()
     {
+        if (Disposed) 
+            return;
+
         _escalationTimer.Dispose();
         Disposed = true;
 
