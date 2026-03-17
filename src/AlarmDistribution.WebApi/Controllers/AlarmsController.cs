@@ -26,10 +26,10 @@ public class AlarmsController : ControllerBase
         return Accepted();
     }
 
-    [HttpPut("{id}/ack")]
-    public async Task<ActionResult> AckAlarmAsync(int id, [FromBody] AckAlarmCommand command)
+    [HttpPut("{id:int}/ack")]
+    public async Task<ActionResult> AckAlarmAsync([FromRoute] int id, [FromBody] AckAlarmCommand command)
     {
-        command.SetAlarmId(id);
+        command.AlarmId = id;
         await _mediator.Send(command);
 
         return NoContent();
