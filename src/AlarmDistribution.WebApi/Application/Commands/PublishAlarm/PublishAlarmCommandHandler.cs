@@ -1,5 +1,4 @@
 ﻿using AlarmDistribution.WebApi.Application.Exceptions;
-using AlarmDistribution.WebApi.Application.Models;
 using AlarmDistribution.WebApi.Application.Services;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;

@@ -1,10 +1,10 @@
-﻿using AlarmDistribution.WebApi.Application.Models;
+﻿using AlarmDistribution.WebApi.Application.Services;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 using AlarmDistribution.WebApi.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
-namespace AlarmDistribution.WebApi.Tests.Application.Models;
+namespace AlarmDistribution.WebApi.Tests.Application.Services;
 
 public class AlarmMonitorTests
 {

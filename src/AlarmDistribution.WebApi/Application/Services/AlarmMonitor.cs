@@ -1,6 +1,6 @@
 ﻿using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 
-namespace AlarmDistribution.WebApi.Application.Models;
+namespace AlarmDistribution.WebApi.Application.Services;
 
 public sealed class AlarmMonitor : IDisposable
 {
