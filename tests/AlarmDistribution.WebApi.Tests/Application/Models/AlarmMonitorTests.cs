@@ -176,6 +176,30 @@ public class AlarmMonitorTests
     }
 
     [Fact]
+    public async Task Constructor_WhenEscalatonTimeoutHasAlreadyBeenElapsedAfterTimerArrived_EscalatesImmediately()
+    {
+        // Arrange
+        var timeout = TimeSpan.FromMinutes(1);
+        var isEscalated = false;
+        var taskCompletionSource = new TaskCompletionSource<bool>();
+        var callback = (AlarmMonitor mon) =>
+        {
+            isEscalated = true;
+            taskCompletionSource.SetResult(true);
+            return Task.CompletedTask;
+        };
+        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + (2 * timeout));
+
+        // Act
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+
+        // Assert
+        await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        Assert.True(isEscalated);
+        Assert.True(sut.Disposed);
+    }
+
+    [Fact]
     public async Task Constructor_WhenErrorDuringEscalation_ErrorIsLogged()
     {
         // Arrange

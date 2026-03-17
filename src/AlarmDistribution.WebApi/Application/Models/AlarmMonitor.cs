@@ -25,6 +25,11 @@ public sealed class AlarmMonitor : IDisposable
         systemClock ??= new SystemClock();
 
         var dueTime = alarm.Timestamp.UtcDateTime + EscalationTimeout - systemClock.UtcNow;
+
+        if (dueTime < TimeSpan.Zero)
+            // It is already too late, escalate immediately
+            dueTime = TimeSpan.Zero;
+
         _escalationTimer = new Timer(EscalateAsync, alarm, dueTime, Timeout.InfiniteTimeSpan);
     }
 
