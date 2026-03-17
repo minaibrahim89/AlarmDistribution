@@ -1,4 +1,6 @@
-﻿using AlarmDistribution.WebApi.Application.Behaviors;
+﻿using System.Threading.Channels;
+using AlarmDistribution.WebApi.Application.BackgroundServices;
+using AlarmDistribution.WebApi.Application.Behaviors;
 using AlarmDistribution.WebApi.Application.Services;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
@@ -19,8 +21,10 @@ public static class ServiceCollectionExtensions
             .AddMediator(opt => opt.ServiceLifetime = ServiceLifetime.Scoped)
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionPipelineBehavior<,>))
             .AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>()
+            .AddSingleton(Channel.CreateUnbounded<Alarm>())
             .AddSingleton<IMonitoredAlarmsService, MonitoredAlarmsService>()
-            .AddRepositories(configuration);
+            .AddRepositories(configuration)
+            .AddHostedService<AlarmEscalationBackgroundService>();
     }
 
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)

@@ -62,23 +62,7 @@ public class PublishAlarmCommandHandler : IRequestHandler<PublishAlarmCommand>
             return;
         }
 
-        _monitoredAlarmsService.StartAlarmMonitoring(alarm, (monitor) => OnEscalating(monitor, patient.SecondaryNurseId));
-    }
-
-    private async Task OnEscalating(AlarmMonitor alarmMonitor, int secondaryNurseId)
-    {
-        try
-        {
-            _logger.LogInformation("Escalating alarm with ID {AlarmId} to secondary nurse with ID {NurseId}", alarmMonitor.Alarm.Id, secondaryNurseId);
-
-            await NotifyNurseAsync(secondaryNurseId, alarmMonitor.Alarm, false, CancellationToken.None);
-
-            _logger.LogInformation("Successfully escalated alarm with ID {AlarmId} to secondary nurse with ID {NurseId}", alarmMonitor.Alarm.Id, secondaryNurseId);
-        }
-        finally
-        {
-            _monitoredAlarmsService.StopAlarmMonitoring(alarmMonitor.Alarm.Id);
-        }
+        _monitoredAlarmsService.StartAlarmMonitoring(alarm);
     }
 
     private async Task<bool> NotifyNurseAsync(int nurseId, Alarm alarm, bool isPrimaryNurse, CancellationToken cancellationToken)

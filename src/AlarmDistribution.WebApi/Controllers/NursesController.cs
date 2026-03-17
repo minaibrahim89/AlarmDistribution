@@ -1,4 +1,5 @@
-﻿using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
+﻿using AlarmDistribution.WebApi.Application.Models;
+using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlarmDistribution.WebApi.Controllers;
@@ -17,20 +18,34 @@ public class NursesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Nurse>> GetNursesAsync(CancellationToken cancellationToken)
+    public async Task<List<NurseResponse>> GetNursesAsync(CancellationToken cancellationToken)
     {
-        return await _nurseRepository.GetAllAsync(true, cancellationToken);
+        var nurses = await _nurseRepository.GetAllAsync(true, cancellationToken);
+
+        return nurses.ConvertAll(nurse => new NurseResponse
+        {
+            Id = nurse.Id,
+            Name = nurse.Name,
+            PendingAlarms = nurse.PendingAlarms
+        });
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Nurse>> GetNurseByIdAsync(int id, CancellationToken cancellationToken)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<NurseResponse>> GetNurseByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
     {
         var nurse = await _nurseRepository.GetByIdAsync(id, true, cancellationToken);
 
         if (nurse == null)
             return NotFound();
 
-        return nurse;
+        var response = new NurseResponse
+        {
+            Id = nurse.Id,
+            Name = nurse.Name,
+            PendingAlarms = nurse.PendingAlarms
+        };
+
+        return response;
     }
 }
 

@@ -1,6 +1,5 @@
 ﻿using AlarmDistribution.WebApi.Application.Commands.PublishAlarm;
 using AlarmDistribution.WebApi.Application.Exceptions;
-using AlarmDistribution.WebApi.Application.Models;
 using AlarmDistribution.WebApi.Application.Services;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
@@ -104,8 +103,7 @@ public class PublishAlarmCommandHandlerTests
 
 		// Assert
 		_monitoredAlarmsServiceMock.Received(1).StartAlarmMonitoring(
-			Arg.Is<Alarm>(a => a.Id == command.AlarmId),
-			Arg.Any<Func<AlarmMonitor, Task>>());
+			Arg.Is<Alarm>(a => a.Id == command.AlarmId));
 	}
 
 	[Fact]
@@ -153,7 +151,8 @@ public class PublishAlarmCommandHandlerTests
 		await _sut.Handle(command, CancellationToken.None);
 
 		// Assert
-		_monitoredAlarmsServiceMock.DidNotReceive().StartAlarmMonitoring(Arg.Any<Alarm>(), Arg.Any<Func<AlarmMonitor, Task>>());
+		_monitoredAlarmsServiceMock.DidNotReceive()
+			.StartAlarmMonitoring(Arg.Any<Alarm>());
 	}
 
 	[Fact]
