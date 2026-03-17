@@ -1,6 +1,5 @@
 ﻿using AlarmDistribution.WebApi.Infrastructure.Database.Context;
 using Mediator;
-using Microsoft.EntityFrameworkCore;
 
 namespace AlarmDistribution.WebApi.Application.Behaviors;
 

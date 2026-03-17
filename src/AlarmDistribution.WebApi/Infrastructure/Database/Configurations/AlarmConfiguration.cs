@@ -26,7 +26,8 @@ public class AlarmConfiguration : IEntityTypeConfiguration<Alarm>
         builder.Property(a => a.Timestamp)
             .IsRequired();
 
-        builder.Property(a => a.AcknowledgingNurseId);
+        builder.Property(a => a.AcknowledgingNurseId)
+            .IsRequired(false);
 
         builder.Property(a => a.AcknowledgedAt);
 
@@ -38,6 +39,7 @@ public class AlarmConfiguration : IEntityTypeConfiguration<Alarm>
         builder.HasOne<Nurse>()
             .WithMany()
             .HasForeignKey(a => a.AcknowledgingNurseId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
