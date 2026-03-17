@@ -72,6 +72,16 @@ public class AlarmMonitorTests
     }
 
     [Fact]
+    public async Task Constructor_DisposedIsInitiallyFalse()
+    {
+        // Arrange - Act
+        var sut = new AlarmMonitor(_testAlarm, _noOpCallback, _loggerMock);
+
+        // Assert
+        Assert.False(sut.Disposed);
+    }
+
+    [Fact]
     public async Task Constructor_WhenRemainingTimeoutIsNotElapsed_DoesNotEscalate()
     {
         // Arrange
@@ -111,15 +121,16 @@ public class AlarmMonitorTests
         };
 
         // Act
-        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(1));
         Assert.False(isEscalated);
+        Assert.True(sut.Disposed);
     }
 
     [Fact]
-    public async Task Constructor_WhenRemainingTimeoutElapsed_Escalates()
+    public async Task Constructor_WhenRemainingTimeoutElapsed_EscalatesAndDisposes()
     {
         // Arrange
         var timeout = TimeSpan.FromMinutes(1);
@@ -134,11 +145,12 @@ public class AlarmMonitorTests
         _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
 
         // Act
-        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
 
         // Assert
         await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.True(isEscalated);
+        Assert.True(sut.Disposed);
     }
 
     [Fact]
@@ -164,38 +176,6 @@ public class AlarmMonitorTests
     }
 
     [Fact]
-    public async Task Constructor_DisposedIsInitiallyFalse()
-    {
-        // Arrange - Act
-        var sut = new AlarmMonitor(_testAlarm, _noOpCallback, _loggerMock);
-
-        // Assert
-        Assert.False(sut.Disposed);
-    }
-
-    [Fact]
-    public async Task Constructor_WhenEscalated_DisposesImmediately()
-    {
-        // Arrange
-        var timeout = TimeSpan.FromMinutes(1);
-        var taskCompletionSource = new TaskCompletionSource<bool>();
-        var callback = (AlarmMonitor mon) =>
-        {
-            taskCompletionSource.SetResult(true);
-            return Task.CompletedTask;
-        };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
-
-        // Act
-        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
-
-        // Assert
-        await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(2));
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        Assert.True(sut.Disposed);
-    }
-
-    [Fact]
     public async Task Constructor_WhenErrorDuringEscalation_ErrorIsLogged()
     {
         // Arrange
@@ -218,6 +198,34 @@ public class AlarmMonitorTests
             Arg.Any<object>(),
             exception,
             Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    #endregion
+
+    #region Dispose tests
+
+    [Fact]
+    public async Task Dispose_WhenEscalationTimeoutElapsed_DoesNotEscalate()
+    {
+        // Arrange
+        var timeout = TimeSpan.FromSeconds(1);
+        var isEscalated = false;
+        var callback = (AlarmMonitor mon) =>
+        {
+            isEscalated = true;
+            return Task.CompletedTask;
+        };
+        _systemClock.UtcNow.Returns(_testAlarm.Timestamp);
+
+        // Act
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        sut.Dispose();
+        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
+
+        // Assert
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        Assert.True(sut.Disposed);
+        Assert.False(isEscalated);
     }
 
     #endregion
