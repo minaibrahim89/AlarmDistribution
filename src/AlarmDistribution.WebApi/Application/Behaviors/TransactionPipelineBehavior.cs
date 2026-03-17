@@ -1,4 +1,4 @@
-﻿using AlarmDistribution.WebApi.Infrastructure.Database;
+﻿using AlarmDistribution.WebApi.Infrastructure.Database.Context;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 

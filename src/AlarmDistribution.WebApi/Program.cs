@@ -1,5 +1,5 @@
 using AlarmDistribution.WebApi.Extensions;
-using AlarmDistribution.WebApi.Infrastructure.Database;
+using AlarmDistribution.WebApi.Infrastructure.Database.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 

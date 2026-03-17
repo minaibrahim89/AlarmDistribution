@@ -1,5 +1,5 @@
 ﻿using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
-using AlarmDistribution.WebApi.Infrastructure.Database;
+using AlarmDistribution.WebApi.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlarmDistribution.WebApi.Infrastructure.Repositories;

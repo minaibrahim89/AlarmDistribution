@@ -4,7 +4,7 @@ using AlarmDistribution.WebApi.Domain.Aggregates.Patients;
 using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace AlarmDistribution.WebApi.Infrastructure.Database;
+namespace AlarmDistribution.WebApi.Infrastructure.Database.Context;
 
 public class AppDbContext : DbContext
 {

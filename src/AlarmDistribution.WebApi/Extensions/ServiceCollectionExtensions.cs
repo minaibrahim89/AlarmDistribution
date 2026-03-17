@@ -3,7 +3,7 @@ using AlarmDistribution.WebApi.Application.Services;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 using AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
 using AlarmDistribution.WebApi.Domain.Aggregates.Patients;
-using AlarmDistribution.WebApi.Infrastructure.Database;
+using AlarmDistribution.WebApi.Infrastructure.Database.Context;
 using AlarmDistribution.WebApi.Infrastructure.Repositories;
 using Ardalis.SharedKernel;
 using Mediator;
