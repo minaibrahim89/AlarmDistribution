@@ -41,7 +41,10 @@ public sealed class AlarmMonitor : IDisposable
         try
         {
             if (!Alarm.IsAcknowledged)
+            {
+                _logger.LogInformation("Escalating alarm with ID {AlarmId} after timeout of {EscalationTimeout}", Alarm.Id, EscalationTimeout);
                 await _onEscalate(this);
+            }
         }
         catch (Exception ex)
         {
@@ -61,7 +64,6 @@ public sealed class AlarmMonitor : IDisposable
         _escalationTimer.Dispose();
         Disposed = true;
 
-        if (_logger.IsEnabled(LogLevel.Information))
-            _logger.LogInformation("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
+        _logger.LogInformation("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
     }
 }
