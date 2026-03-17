@@ -45,7 +45,7 @@ public class PublishAlarmCommandHandler : IRequestHandler<PublishAlarmCommand>
         return Unit.Value;
     }
 
-    public async Task NotifyPrimaryNurseAndMonitorAlarmForEscalationAsync(Alarm alarm, CancellationToken cancellationToken)
+    private async Task NotifyPrimaryNurseAndMonitorAlarmForEscalationAsync(Alarm alarm, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(alarm);
 
@@ -63,10 +63,10 @@ public class PublishAlarmCommandHandler : IRequestHandler<PublishAlarmCommand>
             return;
         }
 
-        _monitoredAlarmsService.StartAlarmMonitoring(alarm, (monitor) => NotifySecondaryNurse(monitor, patient.SecondaryNurseId));
+        _monitoredAlarmsService.StartAlarmMonitoring(alarm, (monitor) => OnEscalating(monitor, patient.SecondaryNurseId));
     }
 
-    private async Task NotifySecondaryNurse(AlarmMonitor alarmMonitor, int secondaryNurseId)
+    private async Task OnEscalating(AlarmMonitor alarmMonitor, int secondaryNurseId)
     {
         try
         {
