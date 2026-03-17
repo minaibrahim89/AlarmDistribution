@@ -1,4 +1,5 @@
 ﻿using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
+using Microsoft.Extensions.Internal;
 
 namespace AlarmDistribution.WebApi.Application.Models;
 
@@ -11,7 +12,7 @@ public sealed class AlarmMonitor : IDisposable
     private readonly ILogger<AlarmMonitor> _logger;
         
     public AlarmMonitor(Alarm alarm, Func<AlarmMonitor, Task> onEscalate, ILogger<AlarmMonitor> logger, 
-        TimeSpan? escalationTimeout = null)
+        TimeSpan? escalationTimeout = null, ISystemClock? systemClock = null)
     {
         ArgumentNullException.ThrowIfNull(alarm);
         ArgumentNullException.ThrowIfNull(onEscalate);
@@ -20,13 +21,15 @@ public sealed class AlarmMonitor : IDisposable
         Alarm = alarm;
         _onEscalate = onEscalate;
         _logger = logger;
-        var timeout = escalationTimeout ?? DEFAULT_ESCALATION_TIMEOUT;
+        EscalationTimeout = escalationTimeout ?? DEFAULT_ESCALATION_TIMEOUT;
+        systemClock ??= new SystemClock();
 
-        var dueTime = alarm.Timestamp.UtcDateTime + timeout - DateTimeOffset.UtcNow;
+        var dueTime = alarm.Timestamp.UtcDateTime + EscalationTimeout - systemClock.UtcNow;
         _escalationTimer = new Timer(EscalateAsync, alarm, dueTime, Timeout.InfiniteTimeSpan);
     }
 
     public Alarm Alarm { get; }
+    public TimeSpan EscalationTimeout { get; }
     public bool Disposed { get; private set; }
 
     private async void EscalateAsync(object? state)
@@ -44,7 +47,6 @@ public sealed class AlarmMonitor : IDisposable
         {
             Dispose();
         }
-
     }
 
     public void Dispose()
