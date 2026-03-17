@@ -1,5 +1,4 @@
 ﻿using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
-using Microsoft.Extensions.Internal;
 
 namespace AlarmDistribution.WebApi.Application.Models;
 
@@ -8,11 +7,11 @@ public sealed class AlarmMonitor : IDisposable
     public static readonly TimeSpan DEFAULT_ESCALATION_TIMEOUT = TimeSpan.FromMinutes(1);
 
     private readonly Func<AlarmMonitor, Task> _onEscalate;
-    private readonly Timer _escalationTimer;
+    private readonly ITimer _escalationTimer;
     private readonly ILogger<AlarmMonitor> _logger;
         
-    public AlarmMonitor(Alarm alarm, Func<AlarmMonitor, Task> onEscalate, ILogger<AlarmMonitor> logger, 
-        TimeSpan? escalationTimeout = null, ISystemClock? systemClock = null)
+    public AlarmMonitor(Alarm alarm, Func<AlarmMonitor, Task> onEscalate, ILogger<AlarmMonitor> logger,
+        TimeSpan? escalationTimeout = null, TimeProvider? timeProvider = null)
     {
         ArgumentNullException.ThrowIfNull(alarm);
         ArgumentNullException.ThrowIfNull(onEscalate);
@@ -22,15 +21,15 @@ public sealed class AlarmMonitor : IDisposable
         _onEscalate = onEscalate;
         _logger = logger;
         EscalationTimeout = escalationTimeout ?? DEFAULT_ESCALATION_TIMEOUT;
-        systemClock ??= new SystemClock();
+        timeProvider ??= TimeProvider.System;
 
-        var dueTime = alarm.Timestamp.UtcDateTime + EscalationTimeout - systemClock.UtcNow;
+        var dueTime = alarm.Timestamp.UtcDateTime + EscalationTimeout - timeProvider.GetUtcNow();
 
         if (dueTime < TimeSpan.Zero)
             // It is already too late, escalate immediately
             dueTime = TimeSpan.Zero;
 
-        _escalationTimer = new Timer(EscalateAsync, alarm, dueTime, Timeout.InfiniteTimeSpan);
+        _escalationTimer = timeProvider.CreateTimer(EscalateAsync, alarm, dueTime, Timeout.InfiniteTimeSpan);
     }
 
     public Alarm Alarm { get; }

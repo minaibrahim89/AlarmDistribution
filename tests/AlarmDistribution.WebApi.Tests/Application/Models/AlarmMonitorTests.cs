@@ -1,6 +1,6 @@
 ﻿using AlarmDistribution.WebApi.Application.Models;
 using AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
-using Microsoft.Extensions.Internal;
+using AlarmDistribution.WebApi.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -8,15 +8,15 @@ namespace AlarmDistribution.WebApi.Tests.Application.Models;
 
 public class AlarmMonitorTests
 {
-    private readonly ISystemClock _systemClock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly Alarm _testAlarm;
     private readonly Func<AlarmMonitor, Task> _noOpCallback;
     private readonly ILogger<AlarmMonitor> _loggerMock;
 
     public AlarmMonitorTests()
     {
-        _systemClock = Substitute.For<ISystemClock>();
         _testAlarm = CreateValidAlarm();
+        _timeProvider = new FakeTimeProvider(_testAlarm.Timestamp);
         _noOpCallback = (AlarmMonitor _) => Task.CompletedTask;
         _loggerMock = Substitute.For<ILogger<AlarmMonitor>>();
     }
@@ -87,8 +87,8 @@ public class AlarmMonitorTests
         // Arrange
         var timeout = TimeSpan.FromMinutes(1);
         var currentClockTime = _testAlarm.Timestamp + timeout - TimeSpan.FromSeconds(30);
-        _systemClock.UtcNow.Returns(currentClockTime);
-        
+        _timeProvider.SetUtcNow(currentClockTime);
+
         var isEscalated = false;
         var callback = (AlarmMonitor mon) =>
         {
@@ -97,7 +97,7 @@ public class AlarmMonitorTests
         };
 
         // Act
-        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(1));
@@ -111,7 +111,7 @@ public class AlarmMonitorTests
         _testAlarm.Acknowledge(2);
         var timeout = TimeSpan.FromMinutes(1);
         var currentClockTime = _testAlarm.Timestamp + timeout;
-        _systemClock.UtcNow.Returns(currentClockTime);
+        _timeProvider.SetUtcNow(currentClockTime);
 
         var isEscalated = false;
         var callback = (AlarmMonitor mon) =>
@@ -121,7 +121,7 @@ public class AlarmMonitorTests
         };
 
         // Act
-        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(1));
@@ -142,10 +142,10 @@ public class AlarmMonitorTests
             taskCompletionSource.SetResult(true);
             return Task.CompletedTask;
         };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + timeout);
 
         // Act
-        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
 
         // Assert
         await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(2));
@@ -164,11 +164,11 @@ public class AlarmMonitorTests
             escalations++;
             return Task.CompletedTask;
         };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + timeout);
 
         // Act
-        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + (2 * timeout));
+        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + (2 * timeout));
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(3));
@@ -188,10 +188,10 @@ public class AlarmMonitorTests
             taskCompletionSource.SetResult(true);
             return Task.CompletedTask;
         };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + (2 * timeout));
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + (2 * timeout));
 
         // Act
-        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
 
         // Assert
         await taskCompletionSource.Task.WaitAsync(TimeSpan.FromSeconds(1));
@@ -209,10 +209,10 @@ public class AlarmMonitorTests
         {
             throw exception;
         };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + timeout);
 
         // Act
-        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        _ = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(1));
@@ -239,12 +239,12 @@ public class AlarmMonitorTests
             isEscalated = true;
             return Task.CompletedTask;
         };
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp);
 
         // Act
-        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _systemClock);
+        var sut = new AlarmMonitor(_testAlarm, callback, _loggerMock, timeout, _timeProvider);
         sut.Dispose();
-        _systemClock.UtcNow.Returns(_testAlarm.Timestamp + timeout);
+        _timeProvider.SetUtcNow(_testAlarm.Timestamp + timeout);
 
         // Assert
         await Task.Delay(TimeSpan.FromSeconds(3));
