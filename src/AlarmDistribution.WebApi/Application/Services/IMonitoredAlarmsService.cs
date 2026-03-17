@@ -8,5 +8,5 @@ public interface IMonitoredAlarmsService
 {
     void StartAlarmMonitoring(Alarm alarm, Func<AlarmMonitor, Task> callback);
 
-    void StopAlarmMonitoring(Guid alarmId);
+    void StopAlarmMonitoring(int alarmId);
 }

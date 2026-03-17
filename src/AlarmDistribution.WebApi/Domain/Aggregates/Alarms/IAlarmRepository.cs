@@ -2,7 +2,7 @@
 
 public interface IAlarmRepository
 {
-    Task<Alarm?> GetAlarmById(Guid alarmId, bool readOnly, CancellationToken cancellationToken = default);
+    Task<Alarm?> GetAlarmById(int alarmId, bool readOnly, CancellationToken cancellationToken = default);
 
     Task AddAsync(Alarm alarm, CancellationToken cancellationToken = default);
 

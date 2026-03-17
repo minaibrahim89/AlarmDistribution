@@ -23,16 +23,16 @@ public class NurseConfiguration : IEntityTypeConfiguration<Nurse>
 
         builder.Ignore(n => n.PendingAlarms);
 
-        var pendingAlarmsComparer = new ValueComparer<List<Guid>>(
+        var pendingAlarmsComparer = new ValueComparer<List<int>>(
             (left, right) => left!.SequenceEqual(right!),
             value => value.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode())),
             value => value.ToList());
 
-        builder.Property<List<Guid>>("_pendingAlarms")
+        builder.Property<List<int>>("_pendingAlarms")
             .HasColumnName("PendingAlarms")
             .HasConversion(
                 value => JsonSerializer.Serialize(value, (JsonSerializerOptions?)null),
-                value => JsonSerializer.Deserialize<List<Guid>>(value, (JsonSerializerOptions?)null) ?? new List<Guid>())
+                value => JsonSerializer.Deserialize<List<int>>(value, (JsonSerializerOptions?)null) ?? new List<int>())
             .Metadata.SetValueComparer(pendingAlarmsComparer);
     }
 }

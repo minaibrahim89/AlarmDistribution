@@ -15,7 +15,7 @@ public class AlarmRepository : IAlarmRepository
         _dbContext = dbContext;
     }
 
-    public Task<Alarm?> GetAlarmById(Guid alarmId, bool readOnly, CancellationToken cancellationToken = default)
+    public Task<Alarm?> GetAlarmById(int alarmId, bool readOnly, CancellationToken cancellationToken = default)
     {
         return readOnly
             ? _dbContext.Alarms.AsNoTracking().FirstOrDefaultAsync(a => a.Id == alarmId, cancellationToken)

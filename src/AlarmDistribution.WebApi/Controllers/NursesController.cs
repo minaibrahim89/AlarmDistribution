@@ -23,7 +23,7 @@ public class NursesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Nurse>> GetNurseByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<Nurse>> GetNurseByIdAsync(int id, CancellationToken cancellationToken)
     {
         var nurse = await _nurseRepository.GetByIdAsync(id, true, cancellationToken);
 

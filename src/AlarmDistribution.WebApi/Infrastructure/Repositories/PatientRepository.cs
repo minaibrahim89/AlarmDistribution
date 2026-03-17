@@ -15,7 +15,7 @@ public class PatientRepository : IPatientRepository
         _dbContext = dbContext;
     }
 
-    public Task<Patient?> GetByIdAsync(Guid patientId, bool readOnly, CancellationToken cancellationToken = default)
+    public Task<Patient?> GetByIdAsync(int patientId, bool readOnly, CancellationToken cancellationToken = default)
     {
         return readOnly
             ? _dbContext.Patients.AsNoTracking().FirstOrDefaultAsync(p => p.Id == patientId, cancellationToken)

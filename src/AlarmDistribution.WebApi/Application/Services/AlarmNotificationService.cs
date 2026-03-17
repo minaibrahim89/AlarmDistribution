@@ -54,7 +54,7 @@ public class AlarmNotificationService : IAlarmNotificationService
         _monitoredAlarmsService.StartAlarmMonitoring(alarm, (monitor) => NotifySecondaryNurse(monitor, patient.SecondaryNurseId));
     }
 
-    private async Task NotifySecondaryNurse(AlarmMonitor alarmMonitor, Guid secondaryNurseId)
+    private async Task NotifySecondaryNurse(AlarmMonitor alarmMonitor, int secondaryNurseId)
     {
         try
         {
@@ -70,7 +70,7 @@ public class AlarmNotificationService : IAlarmNotificationService
         }
     }
 
-    private async Task<bool> NotifyNurseAsync(Guid nurseId, Alarm alarm, bool isPrimaryNurse, CancellationToken cancellationToken)
+    private async Task<bool> NotifyNurseAsync(int nurseId, Alarm alarm, bool isPrimaryNurse, CancellationToken cancellationToken)
     {
         var nurse = await _nurseRepository.GetByIdAsync(nurseId, false, cancellationToken);
 
@@ -89,7 +89,7 @@ public class AlarmNotificationService : IAlarmNotificationService
         return true;
     }
 
-    public void CancelEscalationMonitoring(Guid alarmId)
+    public void CancelEscalationMonitoring(int alarmId)
     {
         _monitoredAlarmsService.StopAlarmMonitoring(alarmId);
     }

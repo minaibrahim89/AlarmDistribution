@@ -1,19 +1,18 @@
 ﻿using AlarmDistribution.WebApi.Domain.Events;
-using AlarmDistribution.WebApi.Extensions;
 using Ardalis.SharedKernel;
 
 namespace AlarmDistribution.WebApi.Domain.Aggregates.Nurses;
 
-public class Nurse : EntityBase<Guid>
+public class Nurse : EntityBase<int>
 {
     // For EF Core
     public Nurse()
     {
     }
 
-    public Nurse(Guid id, string name)
+    public Nurse(int id, string name)
     {
-        ArgumentException.ThrowIfEmpty(id);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         Id = id;
@@ -22,20 +21,20 @@ public class Nurse : EntityBase<Guid>
 
     public string Name { get; }
 
-    public IReadOnlyList<Guid> PendingAlarms => _pendingAlarms;
+    public IReadOnlyList<int> PendingAlarms => _pendingAlarms;
 
-    private readonly List<Guid> _pendingAlarms = [];
+    private readonly List<int> _pendingAlarms = [];
 
-    public void NotifyAlarm(Guid alarmId)
+    public void NotifyAlarm(int alarmId)
     {
-        ArgumentException.ThrowIfEmpty(alarmId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(alarmId);
 
         _pendingAlarms.Add(alarmId);
 
         RegisterDomainEvent(new NurseNotifiedDomainEvent(Id, alarmId));
     }
 
-    public void RemovePendingAlarm(Guid alarmId)
+    public void RemovePendingAlarm(int alarmId)
     {
         _pendingAlarms.Remove(alarmId);
     }

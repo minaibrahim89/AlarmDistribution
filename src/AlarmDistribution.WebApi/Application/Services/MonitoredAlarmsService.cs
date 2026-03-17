@@ -6,7 +6,7 @@ namespace AlarmDistribution.WebApi.Application.Services;
 
 public class MonitoredAlarmsService : IMonitoredAlarmsService
 {
-    private readonly ConcurrentDictionary<Guid, AlarmMonitor> _monitoredAlarms = [];
+    private readonly ConcurrentDictionary<int, AlarmMonitor> _monitoredAlarms = [];
 
     private readonly ILogger<MonitoredAlarmsService> _logger;
     private readonly ILogger<AlarmMonitor> _alarmMonitorLogger;
@@ -25,7 +25,7 @@ public class MonitoredAlarmsService : IMonitoredAlarmsService
             new AlarmMonitor(alarm, callback, _alarmMonitorLogger));
     }
 
-    public void StopAlarmMonitoring(Guid alarmId)
+    public void StopAlarmMonitoring(int alarmId)
     {
         if (_monitoredAlarms.TryGetValue(alarmId, out var alarmMonitor))
             CleanUpMonitor(alarmMonitor);

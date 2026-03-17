@@ -6,5 +6,5 @@ public interface IAlarmNotificationService
 {
     public Task NotifyPrimaryNurseAndMonitorAlarmForEscalationAsync(Alarm alarm, CancellationToken cancellationToken);
 
-    public void CancelEscalationMonitoring(Guid alarmId);
+    public void CancelEscalationMonitoring(int alarmId);
 }

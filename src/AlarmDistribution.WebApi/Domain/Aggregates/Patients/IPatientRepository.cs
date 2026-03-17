@@ -2,5 +2,5 @@
 
 public interface IPatientRepository
 {
-    Task<Patient?> GetByIdAsync(Guid patientId, bool readOnly, CancellationToken cancellationToken = default);
+    Task<Patient?> GetByIdAsync(int patientId, bool readOnly, CancellationToken cancellationToken = default);
 }

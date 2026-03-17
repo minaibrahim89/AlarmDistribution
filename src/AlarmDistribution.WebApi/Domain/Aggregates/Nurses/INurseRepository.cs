@@ -2,12 +2,11 @@
 
 public interface INurseRepository
 {
-    public Task<Nurse?> GetByIdAsync(Guid nurseId, bool readOnly, CancellationToken cancellationToken = default);
+    public Task<Nurse?> GetByIdAsync(int nurseId, bool readOnly, CancellationToken cancellationToken = default);
     
-    Task<bool> ExistsAsync(Guid nurseId, CancellationToken cancellationToken);
+    Task<bool> ExistsAsync(int nurseId, CancellationToken cancellationToken);
 
     public Task<List<Nurse>> GetAllAsync(bool readOnly, CancellationToken cancellationToken = default);
 
     public Task UpdateAsync(Nurse nurse, CancellationToken cancellationToken = default);
-
 }

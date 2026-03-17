@@ -2,11 +2,11 @@
 
 public class AlarmNotFoundException : Exception
 {
-    public AlarmNotFoundException(Guid alarmId) 
+    public AlarmNotFoundException(int alarmId) 
         : base($"Alarm with id {alarmId} is not found")
     {
         AlarmId = alarmId;
     }
 
-    public Guid AlarmId { get; }
+    public int AlarmId { get; }
 }

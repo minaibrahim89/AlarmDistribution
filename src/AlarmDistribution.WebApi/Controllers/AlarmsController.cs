@@ -27,11 +27,11 @@ public class AlarmsController : ControllerBase
     }
 
     [HttpPut("{id}/ack")]
-    public async Task<ActionResult> AckAlarmAsync(Guid id, [FromBody] AckAlarmCommand command)
+    public async Task<ActionResult> AckAlarmAsync(int id, [FromBody] AckAlarmCommand command)
     {
         command.SetAlarmId(id);
         await _mediator.Send(command);
-        
+
         return NoContent();
     }
 }

@@ -2,11 +2,11 @@
 
 public class PatientNotFoundException : Exception
 {
-    public PatientNotFoundException(Guid patientId) 
+    public PatientNotFoundException(int patientId) 
         : base($"Patient with ID {patientId} not found.")
     {
         PatientId = patientId;
     }
 
-    public Guid PatientId { get; }
+    public int PatientId { get; }
 }

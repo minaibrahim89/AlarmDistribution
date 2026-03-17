@@ -1,20 +1,19 @@
 ﻿using AlarmDistribution.WebApi.Domain.Events;
-using AlarmDistribution.WebApi.Extensions;
 using Ardalis.SharedKernel;
 
 namespace AlarmDistribution.WebApi.Domain.Aggregates.Alarms;
 
-public class Alarm : EntityBase<Guid>
+public class Alarm : EntityBase<int>
 {
     // For EF Core
     private Alarm()
     {
     }
 
-    public Alarm(Guid alarmId, Guid patientId, AlarmType type, DateTimeOffset timestamp)
+    public Alarm(int alarmId, int patientId, AlarmType type, DateTimeOffset timestamp)
     {
-        ArgumentOutOfRangeException.ThrowIfEqual(alarmId, Guid.Empty);
-        ArgumentOutOfRangeException.ThrowIfEqual(patientId, Guid.Empty);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(alarmId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(patientId);
 
         if (!Enum.IsDefined(type))
             throw new ArgumentOutOfRangeException(nameof(type), type, "Invalid alarm type.");
@@ -27,20 +26,21 @@ public class Alarm : EntityBase<Guid>
         Timestamp = timestamp;
     }
 
-    public Guid PatientId { get; }
+    public int PatientId { get; }
 
     public AlarmType Type { get; }
 
     public DateTimeOffset Timestamp { get; }
 
-    public Guid? AcknowledgingNurseId { get; private set; }
+    public int? AcknowledgingNurseId { get; private set; }
 
     public DateTimeOffset? AcknowledgedAt { get; private set; }
 
     public bool IsAcknowledged => AcknowledgingNurseId is not null;
-    public void Acknowledge(Guid nurseId)
+
+    public void Acknowledge(int nurseId)
     {
-        ArgumentException.ThrowIfEmpty(nurseId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nurseId);
 
         if (IsAcknowledged)
             return;

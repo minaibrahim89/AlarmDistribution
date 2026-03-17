@@ -3,19 +3,19 @@ using Ardalis.SharedKernel;
 
 namespace AlarmDistribution.WebApi.Domain.Aggregates.Patients;
 
-public class Patient : EntityBase<Guid>
+public class Patient : EntityBase<int>
 {
     // For EF Core
     public Patient()
     {        
     }
 
-    public Patient(Guid id, string name, Guid primaryNurseId, Guid secondaryNurseId)
+    public Patient(int id, string name, int primaryNurseId, int secondaryNurseId)
     {
-        ArgumentException.ThrowIfEmpty(id);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfEmpty(primaryNurseId);
-        ArgumentException.ThrowIfEmpty(secondaryNurseId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(primaryNurseId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(secondaryNurseId);
 
         Id = id;
         Name = name;
@@ -24,6 +24,6 @@ public class Patient : EntityBase<Guid>
     }
 
     public string Name { get; }
-    public Guid PrimaryNurseId { get; }
-    public Guid SecondaryNurseId { get; }
+    public int PrimaryNurseId { get; }
+    public int SecondaryNurseId { get; }
 }

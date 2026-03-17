@@ -15,7 +15,7 @@ public class NurseRepository : INurseRepository
         _dbContext = dbContext;
     }
 
-    public Task<bool> ExistsAsync(Guid nurseId, CancellationToken cancellationToken)
+    public Task<bool> ExistsAsync(int nurseId, CancellationToken cancellationToken)
     {
         return _dbContext.Nurses.AsNoTracking().AnyAsync(n => n.Id == nurseId, cancellationToken);
     }
@@ -27,7 +27,7 @@ public class NurseRepository : INurseRepository
             : _dbContext.Nurses.ToListAsync(cancellationToken);
     }
 
-    public Task<Nurse?> GetByIdAsync(Guid nurseId, bool readOnly, CancellationToken cancellationToken = default)
+    public Task<Nurse?> GetByIdAsync(int nurseId, bool readOnly, CancellationToken cancellationToken = default)
     {
         return readOnly
             ? _dbContext.Nurses.AsNoTracking().FirstOrDefaultAsync(n => n.Id == nurseId, cancellationToken)
