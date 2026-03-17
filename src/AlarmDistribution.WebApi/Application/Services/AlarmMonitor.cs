@@ -7,7 +7,8 @@ public sealed class AlarmMonitor : IDisposable
     public static readonly TimeSpan DEFAULT_ESCALATION_TIMEOUT = TimeSpan.FromMinutes(1);
 
     private readonly Func<AlarmMonitor, Task> _onEscalate;
-    private readonly ITimer _escalationTimer;
+    private readonly object _disposeLock = new();
+    private ITimer? _escalationTimer;
     private readonly ILogger<AlarmMonitor> _logger;
 
     public AlarmMonitor(Alarm alarm, Func<AlarmMonitor, Task> onEscalate, ILogger<AlarmMonitor> logger,
@@ -26,7 +27,6 @@ public sealed class AlarmMonitor : IDisposable
         var dueTime = alarm.Timestamp.UtcDateTime + EscalationTimeout - timeProvider.GetUtcNow();
 
         if (dueTime < TimeSpan.Zero)
-            // It is already too late, escalate immediately
             dueTime = TimeSpan.Zero;
 
         _escalationTimer = timeProvider.CreateTimer(EscalateAsync, alarm, dueTime, Timeout.InfiniteTimeSpan);
@@ -61,12 +61,15 @@ public sealed class AlarmMonitor : IDisposable
 
     public void Dispose()
     {
-        if (Disposed)
-            return;
+        lock (_disposeLock)
+        {
+            if (Disposed)
+                return;
 
-        _escalationTimer.Dispose();
-        Disposed = true;
+            Disposed = true;
+            _escalationTimer?.Dispose();
 
-        _logger.LogDebug("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
+            _logger.LogDebug("Disposed alarm monitor for alarm with ID {AlarmId}", Alarm.Id);
+        }
     }
 }
