@@ -12,6 +12,9 @@ namespace AlarmDistribution.WebApi.Tests.Application.Commands.PublishAlarm;
 
 public class PublishAlarmCommandHandlerTests
 {
+	private const int PRIMARY_NURSE_ID = 10;
+	private const int SECONDARY_NURSE_ID = 20;
+
 	private readonly INurseRepository _nurseRepositoryMock;
 	private readonly IPatientRepository _patientRepositoryMock;
 	private readonly IAlarmRepository _alarmRepositoryMock;
@@ -19,9 +22,6 @@ public class PublishAlarmCommandHandlerTests
 	private readonly ILogger<PublishAlarmCommandHandler> _loggerMock;
 
 	private readonly PublishAlarmCommandHandler _sut;
-
-	private const int PrimaryNurseId = 10;
-	private const int SecondaryNurseId = 20;
 
 	public PublishAlarmCommandHandlerTests()
 	{
@@ -79,7 +79,7 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseFound(PrimaryNurseId);
+		SetupNurseFound(PRIMARY_NURSE_ID);
 		var cancellationToken = CancellationToken.None;
 
 		// Act
@@ -87,7 +87,7 @@ public class PublishAlarmCommandHandlerTests
 
 		// Assert
 		await _nurseRepositoryMock.Received(1).UpdateAsync(
-			Arg.Is<Nurse>(n => n.Id == PrimaryNurseId && n.PendingAlarms.Contains(command.AlarmId)),
+			Arg.Is<Nurse>(n => n.Id == PRIMARY_NURSE_ID && n.PendingAlarms.Contains(command.AlarmId)),
             cancellationToken);
 	}
 
@@ -97,7 +97,7 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseFound(PrimaryNurseId);
+		SetupNurseFound(PRIMARY_NURSE_ID);
 
         // Act
         await _sut.Handle(command, CancellationToken.None);
@@ -114,13 +114,13 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseFound(PrimaryNurseId);
+		SetupNurseFound(PRIMARY_NURSE_ID);
 
 		// Act
 		await _sut.Handle(command, CancellationToken.None);
 
 		// Assert
-		await _nurseRepositoryMock.DidNotReceive().GetByIdAsync(SecondaryNurseId, Arg.Any<bool>(), Arg.Any<CancellationToken>());
+		await _nurseRepositoryMock.DidNotReceive().GetByIdAsync(SECONDARY_NURSE_ID, Arg.Any<bool>(), Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -129,7 +129,7 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseFound(SecondaryNurseId);
+		SetupNurseFound(SECONDARY_NURSE_ID);
 		var cancellationToken = CancellationToken.None;
 
 		// Act
@@ -137,7 +137,7 @@ public class PublishAlarmCommandHandlerTests
 
 		// Assert
 		await _nurseRepositoryMock.Received(1).UpdateAsync(
-			Arg.Is<Nurse>(n => n.Id == SecondaryNurseId && n.PendingAlarms.Contains(command.AlarmId)),
+			Arg.Is<Nurse>(n => n.Id == SECONDARY_NURSE_ID && n.PendingAlarms.Contains(command.AlarmId)),
 			cancellationToken);
 	}
 
@@ -147,7 +147,7 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseFound(SecondaryNurseId);
+		SetupNurseFound(SECONDARY_NURSE_ID);
 
 		// Act
 		await _sut.Handle(command, CancellationToken.None);
@@ -167,7 +167,7 @@ public class PublishAlarmCommandHandlerTests
 		var exception = await Assert.ThrowsAsync<NurseNotFoundException>(
 			async () => await _sut.Handle(command, CancellationToken.None));
 
-		Assert.Equal(SecondaryNurseId, exception.NurseId);
+		Assert.Equal(SECONDARY_NURSE_ID, exception.NurseId);
 	}
 
 	#endregion
@@ -199,7 +199,7 @@ public class PublishAlarmCommandHandlerTests
 	}
 
 	private static Patient CreateTestPatient() =>
-		new(1, "Test Patient", PrimaryNurseId, SecondaryNurseId);
+		new(1, "Test Patient", PRIMARY_NURSE_ID, SECONDARY_NURSE_ID);
 
 	private static Nurse CreateTestNurse(int nurseId) =>
 		new(nurseId, "Test Nurse");
