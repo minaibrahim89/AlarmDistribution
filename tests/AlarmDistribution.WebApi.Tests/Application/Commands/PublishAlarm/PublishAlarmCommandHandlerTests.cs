@@ -129,7 +129,6 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseNotFound(PrimaryNurseId);
 		SetupNurseFound(SecondaryNurseId);
 		var cancellationToken = CancellationToken.None;
 
@@ -148,7 +147,6 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseNotFound(PrimaryNurseId);
 		SetupNurseFound(SecondaryNurseId);
 
 		// Act
@@ -164,8 +162,6 @@ public class PublishAlarmCommandHandlerTests
 		// Arrange
 		var command = CreateTestCommand();
 		SetupPatientFound();
-		SetupNurseNotFound(PrimaryNurseId);
-		SetupNurseNotFound(SecondaryNurseId);
 
 		// Act & Assert
 		var exception = await Assert.ThrowsAsync<NurseNotFoundException>(
@@ -189,25 +185,24 @@ public class PublishAlarmCommandHandlerTests
 		};
 	}
 
-	private static Patient CreateTestPatient() =>
-		new(1, "Test Patient", PrimaryNurseId, SecondaryNurseId);
 
-	private Patient SetupPatientFound()
+	private void SetupPatientFound()
 	{
 		var patient = CreateTestPatient();
 		_patientRepositoryMock.GetByIdAsync(patient.Id, true, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Patient?>(patient));
-		return patient;
 	}
 
-	private Nurse SetupNurseFound(int nurseId)
+	private void SetupNurseFound(int nurseId)
 	{
-		var nurse = new Nurse(nurseId, "Test Nurse");
+		var nurse = CreateTestNurse(nurseId);
 		_nurseRepositoryMock.GetByIdAsync(nurseId, false, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Nurse?>(nurse));
-		return nurse;
 	}
 
-	private void SetupNurseNotFound(int nurseId) =>
-		_nurseRepositoryMock.GetByIdAsync(nurseId, false, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Nurse?>(null));
+	private static Patient CreateTestPatient() =>
+		new(1, "Test Patient", PrimaryNurseId, SecondaryNurseId);
+
+	private static Nurse CreateTestNurse(int nurseId) =>
+		new(nurseId, "Test Nurse");
 
 	#endregion
 }
