@@ -48,6 +48,6 @@ public class Alarm : EntityBase<int>
         AcknowledgingNurseId = nurseId;
         AcknowledgedAt = DateTimeOffset.UtcNow;
 
-        RegisterDomainEvent(new AlarmAckedDomainEvent(Id, nurseId));
+        RegisterDomainEvent(new AlarmAckedDomainEvent(Id, PatientId, nurseId));
     }
 }
