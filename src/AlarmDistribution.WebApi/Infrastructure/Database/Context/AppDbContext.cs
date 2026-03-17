@@ -36,7 +36,8 @@ public class AppDbContext : DbContext
 
         var domainEvents = ChangeTracker
             .Entries<IHasDomainEvents>()
-            .Select(e => e.Entity);
+            .Select(e => e.Entity)
+            .ToList();
 
         await _dispatcher.DispatchAndClearEvents(domainEvents);
 
